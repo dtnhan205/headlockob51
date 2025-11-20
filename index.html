@@ -570,31 +570,53 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     });
   }
-     // ==================== HỎI CHỌN FREE FIRE TH/MAX KHI ĐÓNG POPUP ====================
-  document.querySelector('.modal-btn.success')?.addEventListener('click', () => {
-    // Đóng popup trước
-    document.getElementById('successModal').classList.remove('active');
-    document.getElementById('overlay').classList.remove('active');
-    
-    // Hỏi chọn Free Fire TH hay MAX
-    const choice = confirm("Mở Free Fire TH hay MAX?\n\n[OK] = Free Fire TH\n[Cancel] = Free Fire MAX");
-    
-    setTimeout(() => {
-      if (choice) {
-        // Free Fire TH
-        window.open('freefireth://', '_system');
-        // Fallback: Play Store
-        setTimeout(() => window.open('https://play.google.com/store/apps/details?id=com.dts.freefireth', '_blank'), 1000);
-      } else {
-        // Free Fire MAX
-        window.open('freefiremax://', '_system');
-        // Fallback: Play Store
-        setTimeout(() => window.open('https://play.google.com/store/apps/details?id=com.dts.freefiremax', '_blank'), 1000);
-      }
-    }, 300); // Đợi popup đóng mượt
-  });
 });
 </script>
-    
+    <script>
+// Đoạn này thay thế hoàn toàn đoạn code cũ của bạn
+document.querySelector('.modal-btn.success')?.addEventListener('click', () => {
+    // 1. Đóng popup trước (giữ nguyên hiệu ứng của bạn)
+    const modal   = document.getElementById('successModal');
+    const overlay = document.getElementById('overlay');
+
+    if (modal)   modal.classList.remove('active');
+    if (overlay) overlay.classList.remove('active');
+
+    // 2. Đợi popup đóng xong rồi mới mở Free Fire (rất quan trọng để không bị Safari chặn)
+    setTimeout(() => {
+        openFreeFireApp();
+    }, 400); // 400ms là ngọt nhất – bạn có thể giảm xuống 300 nếu muốn nhanh hơn
+});
+
+// Hàm mở Free Fire cực mạnh – hoạt động ngon lành cả trong Web Clip
+function openFreeFireApp() {
+    const scheme = "freefireth://"; // URL scheme chính thức của Free Fire (2025 vẫn dùng tốt)
+    const appStore = "https://apps.apple.com/vn/app/garena-free-fire/id1300146617";
+
+    // Cách 1: Dùng iframe ẩn (cách mạnh nhất trên iOS 15–18, kể cả trong Web Clip)
+    const iframe = document.createElement("iframe");
+    iframe.style.display = "none";
+    iframe.src = scheme;
+    document.body.appendChild(iframe);
+
+    // Cách 2: Dự phòng bằng location.href (vẫn cần để chắc ăn)
+    window.location.href = scheme;
+
+    // 3. Nếu sau 1,2 giây mà người dùng vẫn còn ở trang web → nghĩa là chưa cài Free Fire
+    // → chuyển hướng sang App Store
+    setTimeout(() => {
+        // Xóa iframe để không làm nặng trang
+        if (iframe && iframe.parentNode) {
+            iframe.parentNode.removeChild(iframe);
+        }
+
+        // Kiểm tra xem có còn focus trang web không
+        // (nếu app mở được thì trang web sẽ bị blur ngay lập tức)
+        if (document.hasFocus && document.hasFocus()) {
+            window.location.href = appStore;
+        }
+    }, 1200);
+}
+</script>
 </body>
 </html>
