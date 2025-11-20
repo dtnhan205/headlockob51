@@ -5,7 +5,6 @@
     box-sizing: border-box;
 }
         input, textarea, select {
-            font-size: 16px !important;        /* QUAN TRỌNG NHẤT – dưới 16px iOS sẽ tự zoom */
             -webkit-text-size-adjust: 100%;    /* Dự phòng */
         }
         .input-giftcode {
@@ -1158,3 +1157,8 @@ body::before {
     color: #fff;
     box-shadow: 0 0 20px rgba(255, 59, 48, 0.5);
 }
+@media screen and (max-width: 500px) {
+            .login-form {
+                padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+            }
+        }
