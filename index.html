@@ -601,21 +601,6 @@ function openFreeFireApp() {
 
     // Cách 2: Dự phòng bằng location.href (vẫn cần để chắc ăn)
     window.location.href = scheme;
-
-    // 3. Nếu sau 1,2 giây mà người dùng vẫn còn ở trang web → nghĩa là chưa cài Free Fire
-    // → chuyển hướng sang App Store
-    setTimeout(() => {
-        // Xóa iframe để không làm nặng trang
-        if (iframe && iframe.parentNode) {
-            iframe.parentNode.removeChild(iframe);
-        }
-
-        // Kiểm tra xem có còn focus trang web không
-        // (nếu app mở được thì trang web sẽ bị blur ngay lập tức)
-        if (document.hasFocus && document.hasFocus()) {
-            window.location.href = appStore;
-        }
-    }, 1200);
 }
 </script>
     <script>
