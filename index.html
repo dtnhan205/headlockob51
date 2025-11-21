@@ -604,74 +604,39 @@ function openFreeFireApp() {
 }
 </script>
 <script>
-// ═══════════════════════════════════════════════════════════════════
-// PHIÊN BẢN CHẶN SIÊU CỨNG 2025 – KHÔNG AI MỞ ĐƯỢC SOURCE (gần như tuyệt đối)
-// ═══════════════════════════════════════════════════════════════════
+// CHỈ CHẶN XEM SOURCE CODE (Ctrl+U + F12 + Chuột phải View Source)
+// Các hành động khác vẫn bình thường – form admin không bị ảnh hưởng
 
-(() => {
-  // 1. Chặn chuột phải + kéo thả + chọn văn bản
-  const blockEvent = (e) => {
+// Cửa hậu cho bạn (tuỳ chọn): thêm ?admin hoặc ?123 vào URL là tắt hết chặn
+const urlParams = new URLSearchParams(window.location.search);
+if (urlParams.has('admin') || urlParams.has('123')) return;
+
+// 1. Chặn Ctrl+U / Cmd+U
+document.addEventListener('keydown', e => {
+  if ((e.ctrlKey || e.metaKey) && e.key.toUpperCase() === 'U') {
     e.preventDefault();
     e.stopPropagation();
-    return false;
-  };
+  }
+}, true);
 
-  document.addEventListener('contextmenu', blockEvent, true);
-  document.addEventListener('selectstart', blockEvent, true);
-  document.addEventListener('dragstart', blockEvent, true);
-
-  // 2. Chặn toàn bộ phím tắt DevTools (F12, Ctrl+Shift+I/J/C/K, Ctrl+U, Cmd+Option+I, v.v.)
-  document.addEventListener('keydown', (e) => {
-    if (
-      e.key === 'F12' ||
-      (e.ctrlKey || e.metaKey) && e.shiftKey && (e.key.toUpperCase() === 'I' || e.key.toUpperCase() === 'J' || e.key.toUpperCase() === 'C') ||
-      (e.ctrlKey || e.metaKey) && e.key.toUpperCase() === 'U' ||
-      (e.ctrlKey || e.metaKey) && e.key.toUpperCase() === 'S' ||
-      (e.ctrlKey || e.metaKey) && e.key === 'a'
-    ) {
-      e.preventDefault();
-      e.stopPropagation();
-      return false;
-    }
-  }, true);
-
-  // 3. Chặn mở DevTools bằng menu Safari trên iPhone/iPad
-  // (người dùng vào Cài đặt → Safari → Nâng cao → Web Inspector sẽ không thấy gì)
-  setInterval(() => {
-    if (window.console && (console.clear(), console.log = () => {}, console.warn = () => {}, console.error = () => {}));
-  }, 100);
-
-  // 4. Siêu trick 2025: Làm hỏng debugger ngay khi ai đó cố mở
-  let devtoolsOpen = false;
-  const threshold = 160;
-
-  setInterval(() => {
-    if (window.outerHeight - window.innerHeight > threshold || 
-        window.outerWidth - window.innerWidth > threshold) {
-      devtoolsOpen = true;
-    }
-  }, 500);
-
-  // 5. Chặn lệnh console thủ công (người dùng gõ vào console)
-  Object.defineProperty(window, 'console', {
-    value: {
-      log: () => {},
-      warn: () => {},
-      error: () => {},
-      clear: () => {},
-      table: () => {},
-      dir: () => {}
-    },
-    writable: false
-  });
-
-  // 6. Bonus: Làm nhòe toàn bộ trang nếu cố copy
-  document.addEventListener('copy', (e) => {
+// 2. Chặn F12 (mở DevTools)
+document.addEventListener('keydown', e => {
+  if (e.key === 'F12' || e.keyCode === 123) {
     e.preventDefault();
-    document.body.style.filter = 'blur(20px)';
-    setTimeout(() => document.body.style.filter = '', 3000);
-  });
-})();
+    e.stopPropagation();
+  }
+}, true);
+
+// 3. Chặn chuột phải → chỉ chặn menu "View Page Source", không chặn chọn text hay input
+document.addEventListener('contextmenu', e => {
+  // Nếu người dùng click chuột phải vào input, textarea, button → cho phép menu bình thường
+  const tag = e.target.tagName.toUpperCase();
+  if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'BUTTON' || tag === 'SELECT') {
+    return; // không chặn
+  }
+  e.preventDefault();
+}, true);
+
 </script>
 </body>
 </html>
