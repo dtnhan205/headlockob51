@@ -100,7 +100,7 @@ function app() {
           return;
         }
 
-        const res = await fetch('https://apikeyapps-production.up.railway.app/api/auth/login', {
+        const res = await fetch('https://dangkhoaios.site/api/auth/login', {
           method: 'POST', 
           headers: {'Content-Type':'application/json'},
           body: JSON.stringify({username: this.username, password: this.password})
@@ -145,7 +145,7 @@ function app() {
       }
       
       try {
-        const res = await fetch('https://apikeyapps-production.up.railway.app/api/packages/create', {
+        const res = await fetch('https://dangkhoaios.site/api/packages/create', {
           method: 'POST', 
           headers: {
             'Content-Type':'application/json', 
@@ -180,7 +180,7 @@ function app() {
       if (!confirm('Xóa package này? Tất cả key liên quan sẽ bị ảnh hưởng.')) return;
       
       try {
-        const res = await fetch(`https://apikeyapps-production.up.railway.app/api/packages/${id}`, {
+        const res = await fetch(`https://dangkhoaios.site/api/packages/${id}`, {
           method: 'DELETE', 
           headers: {'Authorization': `Bearer ${this.token}`}
         });
@@ -213,7 +213,7 @@ function app() {
       }
       
       try {
-        const res = await fetch('https://apikeyapps-production.up.railway.app/api/keys/create', {
+        const res = await fetch('https://dangkhoaios.site/api/keys/create', {
           method: 'POST', 
           headers: {
             'Content-Type':'application/json', 
@@ -259,7 +259,7 @@ function app() {
 
     async loadPackages() {
       try {
-        const res = await fetch('https://apikeyapps-production.up.railway.app/api/packages/list', {
+        const res = await fetch('https://dangkhoaios.site/api/packages/list', {
           headers: {'Authorization': `Bearer ${this.token}`}
         });
         
@@ -273,7 +273,7 @@ function app() {
 
     async loadKeys() {
       try {
-        const res = await fetch('https://apikeyapps-production.up.railway.app/api/keys/list', {
+        const res = await fetch('https://dangkhoaios.site/api/keys/list', {
           headers: {'Authorization': `Bearer ${this.token}`}
         });
         
@@ -290,7 +290,7 @@ function app() {
       if (!confirm('Reset key này? Tất cả thiết bị đã kích hoạt sẽ bị xóa.')) return;
       
       try {
-        const res = await fetch(`https://apikeyapps-production.up.railway.app/api/keys/${id}/reset`, {
+        const res = await fetch(`https://dangkhoaios.site/api/keys/${id}/reset`, {
           method: 'POST', 
           headers: {'Authorization': `Bearer ${this.token}`}
         });
@@ -311,7 +311,7 @@ function app() {
       if (!confirm('Xóa vĩnh viễn key này?')) return;
       
       try {
-        const res = await fetch(`https://apikeyapps-production.up.railway.app/api/keys/${id}`, {
+        const res = await fetch(`https://dangkhoaios.site/api/keys/${id}`, {
           method: 'DELETE', 
           headers: {'Authorization': `Bearer ${this.token}`}
         });
