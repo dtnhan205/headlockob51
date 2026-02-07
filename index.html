@@ -81,7 +81,7 @@
                 <div class="toggle-item">
                     <div class="toggle-label">
                         <span class="toggle-icon">🚀</span>
-                        <span>BOOT RAM</span>
+                        <span>BOST RAM</span>
                     </div>
                     <div class="toggle-switch" data-toggle="boot">
                         <div class="toggle-slider"></div>
@@ -158,7 +158,20 @@
 
     <!-- SUCCESS MODAL -->
     <div class="success-modal" id="successModal">
-        <button class="modal-btn success">
+        <div class="freefire-selector" id="freefireSelector">
+            <h3 style="margin: 0 0 15px 0; color: #fff; font-size: 16px;">Chọn phiên bản Free Fire:</h3>
+            <div class="freefire-options">
+                <button class="freefire-option active" data-version="freefire">
+                    <span>🔥</span>
+                    <span>Free Fire</span>
+                </button>
+                <button class="freefire-option" data-version="freefiremax">
+                    <span>⚡</span>
+                    <span>Free Fire Max</span>
+                </button>
+            </div>
+        </div>
+        <button class="modal-btn success" id="openFreeFireBtn">
             <span class="check-icon">✓</span>
             <span>HeadLock Was Successful!</span>
         </button>
@@ -166,6 +179,29 @@
             <span class="cross-icon">✕</span>
             <span>Turn off HeadLock</span>
         </button>
+    </div>
+
+    <!-- BOST RAM MODAL -->
+    <div class="bostram-modal" id="bostramModal">
+        <div class="bostram-header">
+            <h2>🚀 Tối ưu máy</h2>
+        </div>
+        <div class="bostram-content">
+            <div class="code-terminal" id="codeTerminal">
+                <div class="code-line"><span class="code-prompt">$</span> <span class="code-text">Initializing BOST RAM optimization...</span></div>
+                <div class="code-line"><span class="code-prompt">$</span> <span class="code-text">Scanning system memory...</span></div>
+                <div class="code-line"><span class="code-prompt">$</span> <span class="code-text">Clearing cache files...</span></div>
+                <div class="code-line"><span class="code-prompt">$</span> <span class="code-text">Optimizing RAM allocation...</span></div>
+                <div class="code-line"><span class="code-prompt">$</span> <span class="code-text">Freeing up memory blocks...</span></div>
+                <div class="code-line"><span class="code-prompt">$</span> <span class="code-text">Applying performance boost...</span></div>
+                <div class="code-line"><span class="code-prompt">$</span> <span class="code-text">Finalizing optimization...</span></div>
+            </div>
+            <div class="bostram-success" id="bostramSuccess" style="display: none;">
+                <div class="success-icon">✓</div>
+                <div class="success-text">BOST RAM thành công!</div>
+                <button class="modal-btn success" id="closeBostramBtn">Đóng</button>
+            </div>
+        </div>
     </div>
 
     <div class="overlay" id="overlay"></div>
@@ -329,8 +365,81 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   });
 
-    // ==================== CÁC TOGGLE KHÁC (REG FILES, BOOT RAM, FIX RUNG) ====================
-  document.querySelectorAll('.toggle-switch:not([data-toggle="headlock"])').forEach(toggle => {
+    // ==================== TOGGLE BOST RAM RIÊNG (hiện popup tối ưu máy) ====================
+  // Gắn event listener với capture phase để chạy trước
+  document.addEventListener("click", async (e) => {
+    const bootToggle = e.target.closest('.toggle-switch[data-toggle="boot"]');
+    if (!bootToggle) return;
+    
+    e.stopPropagation(); // Ngăn event bubble lên
+    e.stopImmediatePropagation(); // Ngăn các event listener khác chạy
+      
+      if (!isLoggedIn) {
+        showToggleToast("Chưa nhập key!");
+        return;
+      }
+
+      const check = await activateKey(currentKey);
+      if (!check.success) {
+        showToggleToast("Key hết hạn!");
+        localStorage.removeItem("HEADLOCK_KEY");
+        isLoggedIn = false;
+        showPage("loginScreen");
+        return;
+      }
+
+      const toggle = bootToggle;
+      const isActivating = !toggle.classList.contains("active");
+
+      if (isActivating) {
+        // Hiện popup BOST RAM
+        document.getElementById("bostramModal").classList.add("active");
+        document.getElementById("overlay").classList.add("active");
+        
+        // Reset và bắt đầu animation
+        const terminal = document.getElementById("codeTerminal");
+        const successDiv = document.getElementById("bostramSuccess");
+        if (terminal) terminal.style.display = "block";
+        if (successDiv) successDiv.style.display = "none";
+        
+        // Ẩn tất cả dòng code ban đầu
+        if (terminal) {
+          const codeLines = terminal.querySelectorAll(".code-line");
+          codeLines.forEach(line => {
+            line.style.opacity = "0";
+            line.style.transform = "translateX(-20px)";
+          });
+
+          // Animation từng dòng code xuất hiện
+          codeLines.forEach((line, index) => {
+            setTimeout(() => {
+              line.style.transition = "all 0.3s ease";
+              line.style.opacity = "1";
+              line.style.transform = "translateX(0)";
+            }, index * 400);
+          });
+        }
+
+        // Sau 3 giây hiện thông báo thành công
+        setTimeout(() => {
+          if (terminal) terminal.style.display = "none";
+          if (successDiv) successDiv.style.display = "flex";
+          toggle.classList.add("active");
+          showToggleToast("Đã bật BOST RAM");
+        }, 3000);
+      } else {
+        // Tắt BOST RAM
+        toggle.classList.remove("active");
+        const modal = document.getElementById("bostramModal");
+        const overlay = document.getElementById("overlay");
+        if (modal) modal.classList.remove("active");
+        if (overlay) overlay.classList.remove("active");
+        showToggleToast("Đã tắt BOST RAM");
+      }
+  }, true); // Capture phase
+
+  // ==================== CÁC TOGGLE KHÁC (REG FILES, FIX RUNG) ====================
+  document.querySelectorAll('.toggle-switch:not([data-toggle="headlock"]):not([data-toggle="boot"])').forEach(toggle => {
     toggle.addEventListener("click", async () => {
       if (!isLoggedIn) return showToggleToast("Chưa nhập key!");
 
@@ -413,6 +522,14 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   document.getElementById("overlay").addEventListener("click", () => {
     document.getElementById("infoPanel").classList.remove("active");
+    document.getElementById("successModal").classList.remove("active");
+    document.getElementById("bostramModal").classList.remove("active");
+    document.getElementById("overlay").classList.remove("active");
+  });
+
+  // ==================== BOST RAM MODAL ====================
+  document.getElementById("closeBostramBtn")?.addEventListener("click", () => {
+    document.getElementById("bostramModal").classList.remove("active");
     document.getElementById("overlay").classList.remove("active");
   });
 
@@ -430,7 +547,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   });
 
   document.querySelector(".update-btn").addEventListener("click", () => {
-    showToggleToast("Đã là bản VIP mới nhất 2025!");
+    showToggleToast("Đã là bản VIP mới nhất 2026!");
   });
 
   // Logo click về splash
@@ -574,7 +691,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 </script>
     <script>
 // Đoạn này thay thế hoàn toàn đoạn code cũ của bạn
-document.querySelector('.modal-btn.success')?.addEventListener('click', () => {
+document.getElementById('openFreeFireBtn')?.addEventListener('click', () => {
     // 1. Đóng popup trước (giữ nguyên hiệu ứng của bạn)
     const modal   = document.getElementById('successModal');
     const overlay = document.getElementById('overlay');
@@ -582,16 +699,51 @@ document.querySelector('.modal-btn.success')?.addEventListener('click', () => {
     if (modal)   modal.classList.remove('active');
     if (overlay) overlay.classList.remove('active');
 
-    // 2. Đợi popup đóng xong rồi mới mở Free Fire (rất quan trọng để không bị Safari chặn)
+    // 2. Lấy phiên bản đã chọn
+    const selectedVersion = localStorage.getItem('HEADLOCK_FREEFIRE_VERSION') || 'freefire';
+    
+    // 3. Đợi popup đóng xong rồi mới mở Free Fire (rất quan trọng để không bị Safari chặn)
     setTimeout(() => {
-        openFreeFireApp();
+        openFreeFireApp(selectedVersion);
     }, 400); // 400ms là ngọt nhất – bạn có thể giảm xuống 300 nếu muốn nhanh hơn
 });
 
+// Xử lý chọn phiên bản Free Fire
+document.querySelectorAll('.freefire-option').forEach(btn => {
+    btn.addEventListener('click', function() {
+        // Xóa active khỏi tất cả
+        document.querySelectorAll('.freefire-option').forEach(b => b.classList.remove('active'));
+        // Thêm active vào nút được click
+        this.classList.add('active');
+        // Lưu lựa chọn
+        const version = this.getAttribute('data-version');
+        localStorage.setItem('HEADLOCK_FREEFIRE_VERSION', version);
+    });
+});
+
+// Khôi phục lựa chọn đã lưu khi mở modal
+document.getElementById('onBtn')?.addEventListener('click', () => {
+    const savedVersion = localStorage.getItem('HEADLOCK_FREEFIRE_VERSION') || 'freefire';
+    document.querySelectorAll('.freefire-option').forEach(btn => {
+        btn.classList.remove('active');
+        if (btn.getAttribute('data-version') === savedVersion) {
+            btn.classList.add('active');
+        }
+    });
+});
+
 // Hàm mở Free Fire cực mạnh – hoạt động ngon lành cả trong Web Clip
-function openFreeFireApp() {
-    const scheme = "freefireth://"; // URL scheme chính thức của Free Fire (2025 vẫn dùng tốt)
-    const appStore = "https://apps.apple.com/vn/app/garena-free-fire/id1300146617";
+function openFreeFireApp(version = 'freefire') {
+    // URL scheme cho từng phiên bản
+    const schemes = {
+        'freefire': 'freefireth://',
+        'freefiremax': 'freefiremax://'
+    };
+    
+    const scheme = schemes[version] || schemes['freefire'];
+    const appStore = version === 'freefiremax' 
+        ? "https://apps.apple.com/vn/app/garena-free-fire-max/id1584092163"
+        : "https://apps.apple.com/vn/app/garena-free-fire/id1300146617";
 
     // Cách 1: Dùng iframe ẩn (cách mạnh nhất trên iOS 15–18, kể cả trong Web Clip)
     const iframe = document.createElement("iframe");
